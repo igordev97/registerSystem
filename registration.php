@@ -3,43 +3,46 @@ require_once("./database.php");
 $isRegister = false;
 $userExist = false;
 $message = '';
-if(isset($_POST["email"]) && isset($_POST["password"]) && trim($_POST["email"]) !== "" && trim($_POST["password"]) !== ""){
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $result = $db->query("SELECT * FROM users");
-    
-    if($db){
+if(isset($_POST["email"]) && isset($_POST["password"])){
+    if(trim($_POST["email"]) !== "" && trim($_POST["password"]) !== ""){
+        $email = $_POST["email"];
+        $password = $_POST["password"];
+        $result = $db->query("SELECT * FROM users");
         
-        if($result->num_rows > 0){
-            $rows = $result->fetch_all(MYSQLI_ASSOC);
-            foreach($rows as $row){
-                if($email == $row["email"]){
-                    $message = "You already have account";
-                    $userExist = true;
-                    break;
+        if($db){
+    
+            if($result->num_rows > 0){
+                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                foreach($rows as $row){
+                    if($email == $row["email"]){
+                        $message = "You already have account";
+                        $userExist = true;
+                        break;
+                    }
+                }
+        
+                if(!$userExist){
+                $isRegister = true;
+                $db->query("INSERT INTO users(email, password) VALUES('$email', '$password')");
+                $message = "Account created successfully";
                 }
             }
-    
-            if(!$userExist){
-            $isRegister = true;
-            $db->query("INSERT INTO users(email, password) VALUES('$email', '$password')");
-            $message = "Account created successfully";
+            else{
+                $isRegister = true;
+                $db->query("INSERT INTO users(email, password) VALUES('$email', '$password')");
+                $message = "Account created successfully";
             }
         }
         else{
-            $isRegister = true;
-            $db->query("INSERT INTO users(email, password) VALUES('$email', '$password')");
-            $message = "Account created successfully";
+            $message = "Not Conected to database";
         }
     }
     else{
-        $message = "Not Conected to database";
+        $message = "Please enter valid email or password.";
     }
+
 }
 
-else{
-    $message = 'Please enter valid email or password';
-}
 
 
 
